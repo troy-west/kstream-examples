@@ -3,7 +3,7 @@
             [serdes :as serdes])
   (:import (java.util Date Properties)
            (org.apache.kafka.streams TopologyTestDriver StreamsBuilder)
-           (org.apache.kafka.streams.kstream Predicate TimeWindows Windowed KeyValueMapper Reducer Initializer Aggregator)
+           (org.apache.kafka.streams.kstream Predicate TimeWindows Windowed KeyValueMapper Reducer Initializer Aggregator Materialized)
            (org.apache.kafka.streams.test ConsumerRecordFactory)
            (org.apache.kafka.clients.producer ProducerRecord)
            (org.apache.kafka.common.serialization StringDeserializer StringSerializer Serializer)))
@@ -77,12 +77,13 @@
     (-> (.stream builder "fixtures")
         (.groupByKey)
         (.windowedBy (-> (TimeWindows/of 20000)
-                         (.until 20000)))
+                         (.until 60000)))
         (.aggregate (reify Initializer
                       (apply [_] []))
                     (reify Aggregator
                       (apply [_ _ event agg]
-                        (conj agg event))))
+                        (conj agg event)))
+                    (Materialized/as "current-fixtures"))
         (.toStream (reify KeyValueMapper
                      (apply [_ k _]
                        (.key ^Windowed k))))
@@ -109,4 +110,18 @@
               [{:id "race-1" :state "open" :x 2}]]
              [(read-output ^TopologyTestDriver driver "closed-fixtures")
               (read-output ^TopologyTestDriver driver "closed-fixtures")
-              (read-output ^TopologyTestDriver driver "closed-fixtures")])))))
+              (read-output ^TopologyTestDriver driver "closed-fixtures")]))
+
+      (is (= [[{:id    "race-1"
+                :state "open"}
+               {:id    "race-1"
+                :state "open"
+                :x     1}]
+              [{:id    "race-1"
+                :state "open"
+                :x     2}]]
+             (map #(.value %1)
+                  (iterator-seq
+                   (.fetchAll (.getWindowStore driver "current-fixtures")
+                              (- start-time 20000)
+                              (+ start-time 20000)))))))))
