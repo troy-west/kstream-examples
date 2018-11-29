@@ -54,15 +54,16 @@
             event-5 (.create factory "fixtures" "race-1" {:id "race-1" :state "closed"})
             event-6 (.create factory "fixtures" "race-3" {:id "race-3" :state "open"})]
 
+        (.pipeInput driver event-1)
+        (.pipeInput driver event-2)
+        (.pipeInput driver event-3)
+        (.pipeInput driver event-4)
+        (.pipeInput driver event-5)
+        (.pipeInput driver event-6)
+
         ;; and checking that the closed-fixtures topic contains only the closed event
         (is (= {:id "race-1" :state "closed"}
-               (do (.pipeInput driver event-1)
-                   (.pipeInput driver event-2)
-                   (.pipeInput driver event-3)
-                   (.pipeInput driver event-4)
-                   (.pipeInput driver event-5)
-                   (.pipeInput driver event-6)
-                   (read-output ^TopologyTestDriver driver "closed-fixtures"))))))))
+               (read-output ^TopologyTestDriver driver "closed-fixtures")))))))
 
 (deftest tumbling-aggregation-with-specific-time-advancement
 
