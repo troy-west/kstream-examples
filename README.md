@@ -1,6 +1,14 @@
 # Clojure KStreams
 
-A Clojure library designed to demonstrate a simple Kafka Streams test.
+A Clojure library designed to demonstrate Kafka Streams with Clojure via the Kafka Streams Testing Framework.
+
+No dependency on a running Kafka cluster, just run:
+
+```bash
+lein test
+```
+
+Or run the `troy-west.kstream.test` namespace within a REPL
 
 ## License
 
