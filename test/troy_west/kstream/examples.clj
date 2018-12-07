@@ -102,7 +102,7 @@
       (.advanceTimeMs factory 20000)
       (.pipeInput driver (.create factory "fixtures" "race-1" {:id "race-1" :state "open" :x 2}))
 
-      ;; demonstrate the hopping window output
+      ;; demonstrate the tumbling window output
       (is (= [[{:id "race-1" :state "open"}]
 
               [{:id "race-1" :state "open"}
