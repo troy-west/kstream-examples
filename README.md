@@ -10,7 +10,9 @@ No dependency on a running Kafka cluster, just run:
 lein test
 ```
 
-Or run the `troy-west.kstream.test` namespace within a REPL
+Or run the `troy-west.kstream.examples` test namespace within a REPL
+
+We'll add examples to this library over time, you're welcome to contribute!
 
 ## License
 
