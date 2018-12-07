@@ -12,10 +12,9 @@ lein test
 
 Or run the `troy-west.kstream.examples` test namespace within a REPL
 
-We'll add examples to this library over time, you're welcome to contribute!
-
 Curious to see what Clojure and Kafka Streams tests looking like? [Here are the goodies!](https://github.com/troy-west/kstream-examples/blob/master/test/troy_west/kstream/examples.clj)
 
+We'll add examples to this library over time, you're welcome to contribute.
 
 ## License
 
