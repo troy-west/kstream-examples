@@ -14,6 +14,8 @@ Or run the `troy-west.kstream.examples` test namespace within a REPL
 
 Curious to see what Clojure and Kafka Streams tests looking like? [Here are the goodies!](https://github.com/troy-west/kstream-examples/blob/master/test/troy_west/kstream/examples.clj)
 
+How about Clojure / Transit specific Serdes? [Right over here](https://github.com/troy-west/kstream-examples/blob/master/src/troy_west/serdes.clj).
+
 We'll add examples to this library over time, you're welcome to contribute.
 
 ## License
