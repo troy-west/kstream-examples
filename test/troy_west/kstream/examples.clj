@@ -1,4 +1,4 @@
-(ns troy-west.kstream.test
+(ns troy-west.kstream.examples
   (:require [clojure.test :refer :all]
             [troy-west.serdes :as serdes])
   (:import (java.util Date Properties)
