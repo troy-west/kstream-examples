@@ -1,6 +1,8 @@
-# Clojure KStreams
+# Clojure (hearts) Kafka Streams
 
-A Clojure library designed to demonstrate Kafka Streams with Clojure via the Kafka Streams Testing Framework.
+Clojure is a data-oriented langauge that runs on the JVM, it is the perfect companion for Streaming Compute with Kafka Streams.
+
+This library is designed to demonstrate Kafka Streams with Clojure via the Kafka Streams Testing Framework.
 
 No dependency on a running Kafka cluster, just run:
 
