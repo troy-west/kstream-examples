@@ -1,6 +1,6 @@
 # Clojure (hearts) Kafka Streams
 
-Clojure is a data-oriented langauge that runs on the JVM, it is the perfect companion for Streaming Compute with Kafka Streams.
+Clojure is a data-oriented langauge that runs on the JVM, the perfect companion for Streaming Compute with Kafka Streams.
 
 This library is designed to demonstrate Kafka Streams with Clojure via the Kafka Streams Testing Framework.
 
