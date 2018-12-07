@@ -50,24 +50,17 @@
 
     (with-open [driver (TopologyTestDriver. (.build builder) config)]
 
-      ;; Test that by sending the input topic multiple events
-      (let [event-1 (.create factory "fixtures" "race-1" {:id "race-1" :state "open"})
-            event-2 (.create factory "fixtures" "race-1" {:id "race-1" :state "open"})
-            event-3 (.create factory "fixtures" "race-2" {:id "race-2" :state "open"})
-            event-4 (.create factory "fixtures" "race-1" {:id "race-1" :state "open"})
-            event-5 (.create factory "fixtures" "race-1" {:id "race-1" :state "closed"})
-            event-6 (.create factory "fixtures" "race-3" {:id "race-3" :state "open"})]
+      ;; Test by sending the input topic multiple events
+      (.pipeInput driver (.create factory "fixtures" "race-1" {:id "race-1" :state "open"}))
+      (.pipeInput driver (.create factory "fixtures" "race-1" {:id "race-1" :state "open"}))
+      (.pipeInput driver (.create factory "fixtures" "race-2" {:id "race-2" :state "open"}))
+      (.pipeInput driver (.create factory "fixtures" "race-1" {:id "race-1" :state "open"}))
+      (.pipeInput driver (.create factory "fixtures" "race-1" {:id "race-1" :state "closed"}))
+      (.pipeInput driver (.create factory "fixtures" "race-3" {:id "race-3" :state "open"}))
 
-        (.pipeInput driver event-1)
-        (.pipeInput driver event-2)
-        (.pipeInput driver event-3)
-        (.pipeInput driver event-4)
-        (.pipeInput driver event-5)
-        (.pipeInput driver event-6)
-
-        ;; and checking that the closed-fixtures topic contains only the closed event
-        (is (= {:id "race-1" :state "closed"}
-               (read-output ^TopologyTestDriver driver "closed-fixtures")))))))
+      ;; and checking that the closed-fixtures topic contains only the closed event
+      (is (= {:id "race-1" :state "closed"}
+             (read-output ^TopologyTestDriver driver "closed-fixtures"))))))
 
 (deftest tumbling-aggregation-with-specific-time-advancement
 
@@ -96,17 +89,20 @@
 
     (with-open [driver (TopologyTestDriver. (.build builder) config start-time)]
 
+      ;; send event one
       (.pipeInput driver (.create factory "fixtures" "race-1" {:id "race-1" :state "open"}))
 
+      ;; increment time and send event two
       (.advanceWallClockTime driver 100)
       (.advanceTimeMs factory 100)
       (.pipeInput driver (.create factory "fixtures" "race-1" {:id "race-1" :state "open" :x 1}))
 
-      ;; this is a new tumbling window / aggregation
+      ;;increment to a new tumbling window / aggregation and send event three
       (.advanceWallClockTime driver 20000)
       (.advanceTimeMs factory 20000)
       (.pipeInput driver (.create factory "fixtures" "race-1" {:id "race-1" :state "open" :x 2}))
 
+      ;; demonstrate the hopping window output
       (is (= [[{:id "race-1" :state "open"}]
 
               [{:id "race-1" :state "open"}
@@ -117,6 +113,7 @@
               (read-output ^TopologyTestDriver driver "closed-fixtures")
               (read-output ^TopologyTestDriver driver "closed-fixtures")]))
 
+      ;; read events back directly from the k-table
       (is (= [[{:id    "race-1"
                 :state "open"}
                {:id    "race-1"
