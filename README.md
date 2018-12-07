@@ -1,4 +1,4 @@
-# racing
+# Clojure KStreams
 
 A Clojure library designed to demonstrate a simple Kafka Streams test.
 
