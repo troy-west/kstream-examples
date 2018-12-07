@@ -1,4 +1,4 @@
-(ns serdes
+(ns troy-west.serdes
   (:require [cognitect.transit :as transit])
   (:import (org.apache.kafka.common.serialization Deserializer Serializer Serde)
            (java.io ByteArrayInputStream ByteArrayOutputStream)))

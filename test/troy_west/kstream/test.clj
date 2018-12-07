@@ -1,19 +1,23 @@
-(ns racing.fixture-test
+(ns troy-west.kstream.test
   (:require [clojure.test :refer :all]
-            [serdes :as serdes])
+            [troy-west.serdes :as serdes])
   (:import (java.util Date Properties)
            (org.apache.kafka.streams TopologyTestDriver StreamsBuilder)
-           (org.apache.kafka.streams.kstream Predicate TimeWindows Windowed KeyValueMapper Reducer Initializer Aggregator Materialized)
+           (org.apache.kafka.streams.kstream Predicate TimeWindows Windowed KeyValueMapper Initializer Aggregator Materialized)
            (org.apache.kafka.streams.test ConsumerRecordFactory)
            (org.apache.kafka.clients.producer ProducerRecord)
            (org.apache.kafka.common.serialization StringDeserializer StringSerializer Serializer)))
+
+;; Some examples of testing Kafka Streams Topologies
+
+;; Basic Rule: Don't build a DSL on top of a perfectly good one, use the Java API.
 
 ;; Test config is static across all our tests
 (def config (let [props (Properties.)]
               (.putAll props {"application.id"      "test-racing-fixtures"
                               "bootstrap.servers"   "dummy:1234"
                               "default.key.serde"   "org.apache.kafka.common.serialization.Serdes$StringSerde"
-                              "default.value.serde" "serdes.JsonSerde"})
+                              "default.value.serde" "troy_west.serdes.JsonSerde"})
               props))
 
 (defn read-output
