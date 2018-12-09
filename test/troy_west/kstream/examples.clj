@@ -1,9 +1,10 @@
 (ns troy-west.kstream.examples
-  (:require [clojure.test :refer :all]
+  (:require [clojure.string :as str]
+            [clojure.test :refer :all]
             [troy-west.serdes :as serdes])
   (:import (java.util Date Properties)
            (org.apache.kafka.streams TopologyTestDriver StreamsBuilder)
-           (org.apache.kafka.streams.kstream Predicate TimeWindows Windowed KeyValueMapper Initializer Aggregator Materialized)
+           (org.apache.kafka.streams.kstream Predicate TimeWindows Windowed KeyValueMapper Initializer Aggregator Materialized ValueMapper)
            (org.apache.kafka.streams.test ConsumerRecordFactory)
            (org.apache.kafka.clients.producer ProducerRecord)
            (org.apache.kafka.common.serialization StringDeserializer StringSerializer Serializer)))
@@ -61,6 +62,44 @@
       ;; and checking that the closed-events topic contains only the closed event
       (is (= {:id "race-1" :state "closed"}
              (read-output ^TopologyTestDriver driver "closed-events"))))))
+
+(deftest mult-stream
+
+  (let [start-time   (.getTime (Date.))                     ;; the test start time
+        factory      (ConsumerRecordFactory. "events"       ;; A factory that auto-advances its internal time
+                                             (StringSerializer.)
+                                             (serdes/->JsonSerializer)
+                                             start-time
+                                             6000)
+        builder      (StreamsBuilder.)
+        input-stream (.stream builder "events")]
+
+    ;; It occurs often that clients don't immediately realise that elements of the DSL can have their functions
+    ;; called repeatedly in order to 'branch' the topology graph.
+
+    ;; In this case we take an initial topic, transform it two ways, and write it to two output topics
+    (-> input-stream
+        (.mapValues (reify ValueMapper
+                      (apply [_ event]
+                        (update event :id str/upper-case))))
+        (.to "upper-events"))
+
+    (-> input-stream
+        (.mapValues (reify ValueMapper
+                      (apply [_ event]
+                        (update event :id str/lower-case))))
+        (.to "lower-events"))
+
+    (with-open [driver (TopologyTestDriver. (.build builder) config)]
+
+      ;; Send a single event to the input stream
+      (.pipeInput driver (.create factory "events" "Race-1" {:id "race-1" :state "open"}))
+
+      ;; and check that each output topic has the correct form
+      (is (= {:id "RACE-1" :state "open"}
+             (read-output ^TopologyTestDriver driver "upper-events")))
+      (is (= {:id "race-1" :state "open"}
+             (read-output ^TopologyTestDriver driver "lower-events"))))))
 
 (deftest tumbling-aggregation-with-specific-time-advancement
 
