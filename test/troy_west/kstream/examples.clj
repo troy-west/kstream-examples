@@ -93,7 +93,7 @@
     (with-open [driver (TopologyTestDriver. (.build builder) config)]
 
       ;; Send a single event to the input stream
-      (.pipeInput driver (.create factory "events" "Race-1" {:id "race-1" :state "open"}))
+      (.pipeInput driver (.create factory "events" "Race-1" {:id "Race-1" :state "open"}))
 
       ;; and check that each output topic has the correct form
       (is (= {:id "RACE-1" :state "open"}
